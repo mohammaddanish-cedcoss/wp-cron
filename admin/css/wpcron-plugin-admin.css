@@ -1,0 +1,261 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+ /*======================================
+=            header-section            =
+======================================*/
+.mwb-wp-main-wrapper * {
+  box-sizing: border-box;
+}
+.mwb-wp-main-wrapper {
+  box-sizing: border-box;
+  box-shadow: 0 0 100px 10px rgba(0,0,0,.05);
+  font-family: 'Lato', sans-serif;
+  margin: 20px auto 0;
+  width: 98%;
+}
+.mwb-wp-inner-container {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.mwb-wp-static-menu {
+  background: rgba(93, 134, 167, 0.18);
+  border-left: 1px solid #566b7c;
+  display: inline-block;
+  padding: 20px 15px;
+}
+.mwb-wp-go-pro-banner {
+  background: #143650;
+  border-bottom: 10px solid #F77719;
+}
+.mwb-wp-name-wrapper {
+  align-items: center;
+  display: flex;
+  flex: 0 0 60%;
+  padding: 20px 15px;
+}
+.mwb-wp-name-wrapper img {
+  margin-right: 15px;
+  max-width: 70px;
+}
+.mwb-wp-static-menu {
+  flex: 0 0 40%;
+  padding: 20px 15px;
+}
+.mwb-wp-static-menu:after{
+  display: block;
+  content: "";
+  clear: both;
+}
+.mwb-wp-static-menu li {
+  display: inline-block;
+  margin: 0;
+}
+.mwb-wp-static-menu ul{
+  float: right;
+  margin: 0;
+}
+.mwb-wp-name-wrapper p {
+  color: #fff;
+  font-size: 18px;
+  margin: 0 !important;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.mwb-wp-static-menu li a {
+  font-size: 14px;
+  color: #a7b8c6;
+  margin-bottom: 5px;
+  margin-left: 15px;
+  text-decoration: none;
+}
+.mwb-wp-static-menu li:first-child a {
+  margin-left: 0;
+}
+.mwb-wp-static-menu li a:focus {
+  border: none;
+  box-shadow: none;
+  outline: 0;
+}
+#mwb-wp-go-pro-link, .mwb-wp-overview-go-pro, .mwb-wp-next-connect-tab, .mwb-wp__btn {
+  background: #F77719;
+  border-radius: 3px;
+  color: #ffffff;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 125px;
+  padding: 8px 22px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  margin-right: 20px;
+}
+#mwb-wp-go-pro-link:hover, .mwb-wp-overview-go-pro:hover, .mwb-wp__btn:hover {
+  background-color: #A9C524;
+  color: #ffffff;
+}
+.mwb-wp-next-connect-tab:hover {
+  background: #F77719;
+}
+.mwb-wp-overview-go-pro {
+  margin-right: 30px;
+}
+#mwb-wp-skype-link img {
+  margin-right: 5px;
+  vertical-align: text-bottom;
+}
+#mwb-wp-skype-link {
+  color: #00AAF2;
+  background: #fff;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 7px 8px;
+}
+.mwb-wp-navigator-template {
+  display: block;
+  flex: 0 0 20%;
+}
+.mwb-wp-tabs {
+  position: relative;
+}
+.mwb-wp-tabs .wp-nav-tab-active{
+  position: relative;
+}
+.mwb-wp-tabs .wp-nav-tab-active, .mwb-wp-tabs .wp-nav-tab-active:focus, .mwb-wp-tabs .wp-nav-tab-active:focus:active, .mwb-wp-tabs .wp-nav-tab-active:hover {
+  background: #f77719;
+  color: #fff !important;
+  display: block;
+}
+.wp-nav-tab-active, .wp-nav-tab:focus:active {
+  box-shadow: none;
+}
+.wp-nav-tab-active {
+  margin-bottom: -1px;
+  color: #444;
+}
+.mwb-wp-tabs .wp-nav-tab-active::after {
+  right: 0;
+  border: 8px solid transparent;
+  content: "";
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-right-color: #fff;
+  top: 50%;
+  margin-top: -8px;
+  z-index: 2;
+}
+.mwb-wp-body-template {
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.mwb-wp-nav-tab {
+  background-color: #fff;
+  border-image: none;
+  border-bottom: 1px solid #eee;
+  color: #2b5d89;
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  line-height: 22px;
+  padding: 20px 10px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.mwb-wp-content-template {
+  line-height: 28px;
+}
+.mwb-wp-content-template {
+  box-shadow: -1px -5px 4px 2px rgba(0,0,0,.05);
+  color: #555d66;
+  font-size: 16px;
+  flex: 0 0 80%;
+  padding: 10px 30px 10px 40px;
+  position: relative;
+}
+#mwb-wp-page-header {
+  display: flex;
+  flex: 0 0 100%;
+}
+.mwb-wp-name-wrapper h3 {
+  color: #fff;
+  width: 100%;
+  text-align: center;
+}
+.mwb-wp-main-logo {
+  text-align: center;
+  margin: 0 auto;
+}
+.mwb-wp-main-logo img {
+  height: 300px;
+}
+/*=====  End of header-section  ======*/
+
+ /*===================================================
+=            system-status-table-section            =
+======================================================*/
+.mwb-wp-table{
+  border-collapse: collapse;
+  width: 100%;
+}
+.mwb-wp-table td, .mwb-wp-table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.mwb-wp-table tr:nth-child(even){background-color: #f2f2f2;}
+
+.mwb-wp-table tr:hover {background-color: #ddd;}
+
+.mwb-wp-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #143650;
+  color: #fff;
+}
+
+#mwb-wp-wp {
+  margin-bottom: 20px;
+}
+
+#mwb-wp-wp tbody tr td {
+  color: #4CAF28;
+}
+
+.wp-descp-tip{
+  font-style: italic;
+  font-size: 13px;
+}
+.mwb-plugins-row td {
+  font-size: 15px;
+  font-weight: 600;
+  color: #228b22;
+  text-align: center;
+}
+.mwb-plugins-head-row th {
+  text-align: center;
+  width: 50%;
+}
+.mwb-wp-main-logo h2 {
+  font-size: 25px;
+  text-transform: capitalize;
+  margin-top: 5px;
+}
+.mwb-wp-main-logo h3 {
+  font-size: 20px;
+  width: 75%;
+  text-align: center;
+  margin: 0 auto;
+  padding: 20px;
+  line-height: 30px;
+}
+/*=====  End of system-status-table-section  ======*/
