@@ -365,29 +365,29 @@ class Wpcron_Plugin_Admin {
 	 * @return void
 	 */
 	public function add_complete_post(){
-		$xml = simplexml_load_file( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
-		$data = $xml->record;
-		foreach ( $data as $record ) {
-			$title  = strval( $record->name );
-			$sku    = strval( $record->sku );
-			$price  = strval( $record->price );
-			$review = strval( $record->reviews );
+			$xml = simplexml_load_file( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
+			$data = $xml->record;
+			foreach ( $data as $record ) {
+				$title  = strval( $record->name );
+				$sku    = strval( $record->sku );
+				$price  = strval( $record->price );
+				$review = strval( $record->reviews );
 
-			// Create post object.
-			$my_post = array(
-				'post_title'  => $title,
-				'post_status' => 'publish',
-				'post_author' => 1,
-				'post_type'   => 'product',
+				// Create post object.
+				$my_post = array(
+					'post_title'  => $title,
+					'post_status' => 'publish',
+					'post_author' => 1,
+					'post_type'   => 'product',
 
-			);
-			// Insert the post into the database.
-			$post_id = wp_insert_post( $my_post );
-			add_post_meta( $post_id, '_product_sku_meta_key', $sku );
-			add_post_meta( $post_id, '_product_price_meta_key', $price );
-			add_post_meta( $post_id, '_product_review_meta_key', $review );
+				);
+				// Insert the post into the database.
+				$post_id = wp_insert_post( $my_post );
+				add_post_meta( $post_id, '_product_sku_meta_key', $sku );
+				add_post_meta( $post_id, '_product_price_meta_key', $price );
+				add_post_meta( $post_id, '_product_review_meta_key', $review );
 
-		}
+			}
 	}
 
 	/**
@@ -415,7 +415,6 @@ class Wpcron_Plugin_Admin {
 	 * Function to insert batch post in DB.
 	 */
 	public function bl_cron_exec() {
-		session_start();
 		$handle = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/MOCK_DATA.csv', 'r' );
 		$array = array();
 
@@ -430,6 +429,38 @@ class Wpcron_Plugin_Admin {
 			$current = fgetcsv( $handle );
 			array_push( $array, $current );
 			$totalele++;
+
+			$args = array(
+				'post_type' => 'product',
+				'meta_query' => array(
+					array(
+						'key'     => '_product_sku_meta_key',
+						'value'   => $current[2],
+						'compare' => '=',
+					),
+				),
+			);
+			$posts = get_posts( $args );
+
+			if ( $posts[0]->post_title != $current[1] ) {
+				$my_post = array(
+					'ID'          => $posts[0]->ID,
+					'post_title'  => $current[1],
+					'post_status' => 'publish',
+					'post_author' => 1,
+				);
+				wp_update_post( $my_post );
+			}
+
+			$post_meta_price = get_post_meta( $posts[0]->ID, '_product_price_meta_key' );
+			$post_meta_review = get_post_meta( $posts[0]->ID, '_product_review_meta_key' );
+
+			if ( $current[3] != $post_meta_price[0] ) {
+				update_post_meta( $posts[0]->ID, '_product_price_meta_key', $current[3] );
+			}
+			if ( $current[4] !=  $post_meta_review[0] ) {
+				update_post_meta( $posts[0]->ID, '_product_review_meta_key', $current[4] );
+			}
 		}
 
 		$count = get_option( 'countterm' );
@@ -451,7 +482,6 @@ class Wpcron_Plugin_Admin {
 				$rcount = get_option( 'countterm' );
 				update_option( 'countterm', $rcount + 1 );
 			}
-
 		}
 		fclose( $handle );
 	}
