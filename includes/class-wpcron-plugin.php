@@ -187,11 +187,12 @@ class Wpcron_Plugin {
 		// Custom hook use to execute bl_cron_exec.
 		$this->loader->add_action( 'bl_cron_hook', $wp_plugin_admin, 'bl_cron_exec' );
 
-		//$this->loader->add_action( 'wp', $wp_plugin_admin, 'add_complete_post' );		
+		//$this->loader->add_action( 'wp', $wp_plugin_admin, 'add_complete_post' );	
 
-		$this->loader->add_action( 'bl_cron_hook', $wp_plugin_admin, 'export_csv_hook' );
+		// Add export button into post product type.
+		$this->loader->add_action( 'manage_posts_extra_tablenav', $wp_plugin_admin, 'admin_post_list_add_export_button', 20, 1 );
 
-		$this->loader->add_action( 'export_all_posts', $wp_plugin_admin, 'func_export_all_posts' );
+		$this->loader->add_action( 'init', $wp_plugin_admin, 'func_export_all_posts' );
 
 	}
 

@@ -417,27 +417,23 @@ class Wpcron_Plugin_Admin {
 	public function bl_cron_exec() {
 		$handle = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/MOCK_DATA.csv', 'r' );
 		$array = array();
-		$countterm = get_option( 'countterm' );
 
+		$countterm = get_option( 'countterm' );
 		if ( $countterm == '' ) {
 			add_option( 'countterm', '0' );
 		}
-		if ( $countterm == '' ) {
-			add_option( 'totalele', '0' );
-		}
 
-		update_option( 'totalele', '0' );
+		$totalele = '0';
 
 		while ( ! feof( $handle ) ) {
 			$current = fgetcsv( $handle );
 			array_push( $array, $current );
-			$totalele = get_option( 'totalele' );
-			update_option( 'totalele', $totalele + 1 );
+			$totalele++;
 		}
 
 		$count = get_option( 'countterm' );
 		for ( $i = $count; $i < ( $count + 10 ); $i++ ) {
-			if ( $i < get_option( 'totalele' ) ) {
+			if ( $i < $totalele ) {
 				// Add post.
 				$my_post = array(
 					'post_title'  => $array[$i][1],
@@ -455,7 +451,7 @@ class Wpcron_Plugin_Admin {
 				update_option( 'countterm', $rcount + 1 );
 			}
 
-		}	
+		}
 		fclose( $handle );
 	}
 
@@ -464,42 +460,60 @@ class Wpcron_Plugin_Admin {
 	 *
 	 * @return void
 	 */
-	public function export_csv_hook(){
+	public function export_csv_hook() {
 		if ( ! wp_next_scheduled( 'export_all_posts' ) ) {
 			wp_schedule_event( time(), '5min', 'export_all_posts' ); // 5 min scheduler for event bl_cron_hook
 		}
 	}
 
+	/**
+	 * Function to add a button in product post type page.
+	 *
+	 * @param [type] $which
+	 * @return void
+	 */
+	public function admin_post_list_add_export_button( $which ) {
+		global $typenow;
+ 
+		if ( 'product' === $typenow && 'top' === $which ) {
+			?>
+			<input type="submit" name="export_all_posts" class="button button-primary" value="<?php _e( 'Export All Posts' ); ?>" />
+			<?php
+		}
+	}
+
 	// Function to export post.
 	public function func_export_all_posts() {
-		$arg = array(
-			'post_type' => 'product',
-			'post_status' => 'publish',
-			'posts_per_page' => -1,
-		);
-		global $post;
-		$arr_post = get_posts($arg);
-		if ($arr_post) {
-			header( 'Content-type: text/csv' );
-			header( 'Content-Disposition: attachment; filename="wp-posts.csv"' );
-			header( 'Pragma: no-cache' );
-			header( 'Expires: 0' );
+		if ( isset ( $_GET['export_all_posts'] ) ) {
+			$arg = array(
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+			);
+			global $post;
+			$arr_post = get_posts( $arg );
+			if ( $arr_post ) {
+				header( 'Content-type: text/csv' );
+				header( 'Content-Disposition: attachment; filename="wp-posts.csv"' );
+				header( 'Pragma: no-cache' );
+				header( 'Expires: 0' );
 
-			$file = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/csvfile.csv', 'w');
+				$file = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/csvfile.csv', 'w');
 
-			fputcsv( $file, array( 'Post Title', 'Price', 'Price', 'Review' ) );
+				fputcsv( $file, array( 'Post Title', 'Price', 'Price', 'Review' ) );
 
-			foreach ( $arr_post as $post ) {
-				setup_postdata( $post );
+				foreach ( $arr_post as $post ) {
+					setup_postdata( $post );
 
-				$sku = get_post_meta( $post->ID, '_product_sku_meta_key', true);
-				$price = get_post_meta( $post->ID, '_product_price_meta_key', true);
-				$review = get_post_meta( $post->ID, '_product_review_meta_key', true);
+					$sku = get_post_meta( $post->ID, '_product_sku_meta_key', true);
+					$price = get_post_meta( $post->ID, '_product_price_meta_key', true);
+					$review = get_post_meta( $post->ID, '_product_review_meta_key', true);
 
-				fputcsv($file, array(get_the_title(), $sku, $price, $review ) );
+					fputcsv($file, array(get_the_title(), $sku, $price, $review ) );
+				}
+
+				exit();
 			}
-
-			exit();
 		}
 	}
 }
