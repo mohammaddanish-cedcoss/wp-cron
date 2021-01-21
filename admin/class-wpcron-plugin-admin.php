@@ -422,15 +422,22 @@ class Wpcron_Plugin_Admin {
 		if ( $countterm == '' ) {
 			add_option( 'countterm', '0' );
 		}
+		if ( $countterm == '' ) {
+			add_option( 'totalele', '0' );
+		}
+
+		update_option( 'totalele', '0' );
 
 		while ( ! feof( $handle ) ) {
 			$current = fgetcsv( $handle );
 			array_push( $array, $current );
+			$totalele = get_option( 'totalele' );
+			update_option( 'totalele', $totalele + 1 );
 		}
 
 		$count = get_option( 'countterm' );
 		for ( $i = $count; $i < ( $count + 10 ); $i++ ) {
-			if ( $i < 31 ) {
+			if ( $i < get_option( 'totalele' ) ) {
 				// Add post.
 				$my_post = array(
 					'post_title'  => $array[$i][1],
