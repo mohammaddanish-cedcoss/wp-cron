@@ -189,7 +189,8 @@ class Wpcron_Plugin {
 
 		$this->loader->add_action( 'wp', $wp_plugin_admin, 'add_complete_post' );		
 
-		$this->loader->add_action( 'init', $wp_plugin_admin, 'export_csv_hook' );
+		$this->loader->add_action( 'bl_cron_hook', $wp_plugin_admin, 'export_csv_hook' );
+
 		$this->loader->add_action( 'export_all_posts', $wp_plugin_admin, 'func_export_all_posts' );
 
 	}

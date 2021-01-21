@@ -360,27 +360,10 @@ class Wpcron_Plugin_Admin {
 	}
 
 	/**
-	 * Function for event interval.
+	 * Function to add post through xml file.
 	 *
-	 * @param [type] $schedules store info aabout scheduler.
-	 * @return $schedules
+	 * @return void
 	 */
-	public function bl_add_cron_intervals( $schedules ) {
-		$schedules['5min'] = array( // Provide the programmatic name to be used in code.
-			'interval' => 5, // Intervals are listed in seconds.
-			'display'  => __( 'Every 5 Mins' ), // Easy to read display name.
-		);
-		return $schedules; // Do not forget to give back the list of schedules!
-	}
-
-	public function check_next_schedule(){
-		if ( ! wp_next_scheduled( 'bl_cron_hook' ) ) {
-			wp_schedule_event( time(), '5min', 'bl_cron_hook' ); // 5 min scheduler for event bl_cron_hook
-		}
-		// $csv = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
-		// print_r( $csv );
-	}
-
 	public function add_complete_post(){
 			// $xml = simplexml_load_file( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
 			// $data = $xml->record;
@@ -404,60 +387,85 @@ class Wpcron_Plugin_Admin {
 			// 	add_post_meta( $post_id, '_product_price_meta_key', $price );
 			// 	add_post_meta( $post_id, '_product_review_meta_key', $review );
 
-
-
 			// }
 	}
 
 	/**
-	 * Function to insert post in DB.
+	 * Function for event interval.
+	 *
+	 * @param [type] $schedules store info aabout scheduler.
+	 * @return $schedules
+	 */
+	public function bl_add_cron_intervals( $schedules ) {
+		$schedules['5min'] = array( // Provide the programmatic name to be used in code.
+			'interval' => 10, // Intervals are listed in seconds.
+			'display'  => __( 'Every 5 Mins' ), // Easy to read display name.
+		);
+		return $schedules; // Do not forget to give back the list of schedules!
+	}
+
+	// check if event in queue.
+	public function check_next_schedule(){
+		if ( ! wp_next_scheduled( 'bl_cron_hook' ) ) {
+			wp_schedule_event( time(), '5min', 'bl_cron_hook' ); // 5 min scheduler for event bl_cron_hook
+		}
+	}
+
+	/**
+	 * Function to insert batch post in DB.
 	 */
 	public function bl_cron_exec() {
+		$handle = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/MOCK_DATA.csv', 'r' );
+		$array = array();
 		$countterm = get_option( 'countterm' );
-		$xml = simplexml_load_file( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
-		$data = $xml->record;
-		// if ( empty( $countterm ) ){
-		// 	add_option('countterm', '0' );
-		// }
+
+		if ( $countterm == '' ) {
+			add_option( 'countterm', '0' );
+		}
+
+		while ( ! feof( $handle ) ) {
+			$current = fgetcsv( $handle );
+			array_push( $array, $current );
+		}
 		$count = get_option( 'countterm' );
-		// for ( $i= $count; $i <= ( $count+10 ); $count++ ) {
-		// 	update_option( 'countterm', $count+1 );
-		// }
-			//$count0 = 0;
 
-			$title  = strval( $record->name );
-			$sku    = strval( $record->sku );
-			$price  = strval( $record->price );
-			$review = strval( $record->reviews );
+			for ( $i = $count; $i < ( $count + 10 ); $i++ ) {
 
-			// if ( $count == $count0 ) {
-			// 	// Create post object.
-			// 	$my_post = array(
-			// 		'post_title'  => $title,
-			// 		'post_status' => 'publish',
-			// 		'post_author' => 1,
-			// 		'post_type'   => 'product',
+				if ( $i<=30 ) {
+					// Add post.
+					$my_post = array(
+						'post_title'  => $array[$i][1],
+						'post_status' => 'publish',
+						'post_author' => 1,
+						'post_type'   => 'product',
+					);
+					// Insert the post meta into the database.
+					$post_id = wp_insert_post( $my_post );
 
-			// 	);
-			// 	// Insert the post into the database.
-			// 	$post_id = wp_insert_post( $my_post );
-			// 	add_post_meta( $post_id, '_product_sku_meta_key', $sku );
-			// 	add_post_meta( $post_id, '_product_price_meta_key', $price );
-			// 	add_post_meta( $post_id, '_product_review_meta_key', $review );
+					add_post_meta( $post_id, '_product_sku_meta_key', $array[$i][2] );
+					add_post_meta( $post_id, '_product_price_meta_key',$array[$i][3] );
+					add_post_meta( $post_id, '_product_review_meta_key',$array[$i][4] );
 
-			// 	update_option( 'countterm', $count + 1 );
-			// $count0 + 1;
+				}
+
+			}
+		update_option( 'countterm', $count + 10 );
+		fclose( $handle );
 
 	}
 
+	/**
+	 * Check if schedule in queue.
+	 *
+	 * @return void
+	 */
 	public function export_csv_hook(){
 		if ( ! wp_next_scheduled( 'export_all_posts' ) ) {
 			wp_schedule_event( time(), '5min', 'export_all_posts' ); // 5 min scheduler for event bl_cron_hook
 		}
-		// $csv = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
-		// print_r( $csv );
 	}
 
+	// Function to export post.
 	public function func_export_all_posts() {
 		$arg = array(
 			'post_type' => 'product',
@@ -472,7 +480,7 @@ class Wpcron_Plugin_Admin {
 			header( 'Pragma: no-cache' );
 			header( 'Expires: 0' );
 
-			$file = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread', 'w');
+			$file = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/csvfile.csv', 'w');
 
 			fputcsv( $file, array( 'Post Title', 'Price', 'Price', 'Review' ) );
 
@@ -490,7 +498,4 @@ class Wpcron_Plugin_Admin {
 			exit();
 		}
 	}
-
-
-
 }
