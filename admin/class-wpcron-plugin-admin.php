@@ -365,29 +365,29 @@ class Wpcron_Plugin_Admin {
 	 * @return void
 	 */
 	public function add_complete_post(){
-			$xml = simplexml_load_file( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
-			$data = $xml->record;
-			foreach ( $data as $record ) {
-				$title  = strval( $record->name );
-				$sku    = strval( $record->sku );
-				$price  = strval( $record->price );
-				$review = strval( $record->reviews );
+		$xml = simplexml_load_file( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
+		$data = $xml->record;
+		foreach ( $data as $record ) {
+			$title  = strval( $record->name );
+			$sku    = strval( $record->sku );
+			$price  = strval( $record->price );
+			$review = strval( $record->reviews );
 
-				// Create post object.
-				$my_post = array(
-					'post_title'  => $title,
-					'post_status' => 'publish',
-					'post_author' => 1,
-					'post_type'   => 'product',
+			// Create post object.
+			$my_post = array(
+				'post_title'  => $title,
+				'post_status' => 'publish',
+				'post_author' => 1,
+				'post_type'   => 'product',
 
-				);
-				// Insert the post into the database.
-				$post_id = wp_insert_post( $my_post );
-				add_post_meta( $post_id, '_product_sku_meta_key', $sku );
-				add_post_meta( $post_id, '_product_price_meta_key', $price );
-				add_post_meta( $post_id, '_product_review_meta_key', $review );
+			);
+			// Insert the post into the database.
+			$post_id = wp_insert_post( $my_post );
+			add_post_meta( $post_id, '_product_sku_meta_key', $sku );
+			add_post_meta( $post_id, '_product_price_meta_key', $price );
+			add_post_meta( $post_id, '_product_review_meta_key', $review );
 
-			}
+		}
 	}
 
 	/**
@@ -415,6 +415,7 @@ class Wpcron_Plugin_Admin {
 	 * Function to insert batch post in DB.
 	 */
 	public function bl_cron_exec() {
+		session_start();
 		$handle = fopen( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/MOCK_DATA.csv', 'r' );
 		$array = array();
 
