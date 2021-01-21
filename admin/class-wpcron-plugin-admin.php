@@ -365,29 +365,29 @@ class Wpcron_Plugin_Admin {
 	 * @return void
 	 */
 	public function add_complete_post(){
-			// $xml = simplexml_load_file( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
-			// $data = $xml->record;
-			// foreach ( $data as $record ) {
-			// 	$title  = strval( $record->name );
-			// 	$sku    = strval( $record->sku );
-			// 	$price  = strval( $record->price );
-			// 	$review = strval( $record->reviews );
+			$xml = simplexml_load_file( plugin_dir_path( dirname( __FILE__ ) ) . 'Fileread/dataset.xml' );
+			$data = $xml->record;
+			foreach ( $data as $record ) {
+				$title  = strval( $record->name );
+				$sku    = strval( $record->sku );
+				$price  = strval( $record->price );
+				$review = strval( $record->reviews );
 
-			// 	// Create post object.
-			// 	$my_post = array(
-			// 		'post_title'  => $title,
-			// 		'post_status' => 'publish',
-			// 		'post_author' => 1,
-			// 		'post_type'   => 'product',
+				// Create post object.
+				$my_post = array(
+					'post_title'  => $title,
+					'post_status' => 'publish',
+					'post_author' => 1,
+					'post_type'   => 'product',
 
-			// 	);
-			// 	// Insert the post into the database.
-			// 	$post_id = wp_insert_post( $my_post );
-			// 	add_post_meta( $post_id, '_product_sku_meta_key', $sku );
-			// 	add_post_meta( $post_id, '_product_price_meta_key', $price );
-			// 	add_post_meta( $post_id, '_product_review_meta_key', $review );
+				);
+				// Insert the post into the database.
+				$post_id = wp_insert_post( $my_post );
+				add_post_meta( $post_id, '_product_sku_meta_key', $sku );
+				add_post_meta( $post_id, '_product_price_meta_key', $price );
+				add_post_meta( $post_id, '_product_review_meta_key', $review );
 
-			// }
+			}
 	}
 
 	/**
@@ -398,7 +398,7 @@ class Wpcron_Plugin_Admin {
 	 */
 	public function bl_add_cron_intervals( $schedules ) {
 		$schedules['5min'] = array( // Provide the programmatic name to be used in code.
-			'interval' => 10, // Intervals are listed in seconds.
+			'interval' => 300, // Intervals are listed in seconds.
 			'display'  => __( 'Every 5 Mins' ), // Easy to read display name.
 		);
 		return $schedules; // Do not forget to give back the list of schedules!
@@ -427,31 +427,29 @@ class Wpcron_Plugin_Admin {
 			$current = fgetcsv( $handle );
 			array_push( $array, $current );
 		}
+
 		$count = get_option( 'countterm' );
+		for ( $i = $count; $i < ( $count + 10 ); $i++ ) {
+			if ( $i < 31 ) {
+				// Add post.
+				$my_post = array(
+					'post_title'  => $array[$i][1],
+					'post_status' => 'publish',
+					'post_author' => 1,
+					'post_type'   => 'product',
+				);
+				// Insert the post meta into the database.
+				$post_id = wp_insert_post( $my_post );
 
-			for ( $i = $count; $i < ( $count + 10 ); $i++ ) {
-
-				if ( $i<=30 ) {
-					// Add post.
-					$my_post = array(
-						'post_title'  => $array[$i][1],
-						'post_status' => 'publish',
-						'post_author' => 1,
-						'post_type'   => 'product',
-					);
-					// Insert the post meta into the database.
-					$post_id = wp_insert_post( $my_post );
-
-					add_post_meta( $post_id, '_product_sku_meta_key', $array[$i][2] );
-					add_post_meta( $post_id, '_product_price_meta_key',$array[$i][3] );
-					add_post_meta( $post_id, '_product_review_meta_key',$array[$i][4] );
-
-				}
-
+				add_post_meta( $post_id, '_product_sku_meta_key', $array[$i][2] );
+				add_post_meta( $post_id, '_product_price_meta_key',$array[$i][3] );
+				add_post_meta( $post_id, '_product_review_meta_key',$array[$i][4] );
+				$rcount = get_option( 'countterm' );
+				update_option( 'countterm', $rcount + 1 );
 			}
-		update_option( 'countterm', $count + 10 );
-		fclose( $handle );
 
+		}	
+		fclose( $handle );
 	}
 
 	/**
@@ -487,10 +485,9 @@ class Wpcron_Plugin_Admin {
 			foreach ( $arr_post as $post ) {
 				setup_postdata( $post );
 
-				$sku = get_post_meta( $post->ID, 'sku', true);
-				$price = get_post_meta( $post->ID, 'price', true);
-				$review = get_post_meta( $post->ID, 'review', true);
-
+				$sku = get_post_meta( $post->ID, '_product_sku_meta_key', true);
+				$price = get_post_meta( $post->ID, '_product_price_meta_key', true);
+				$review = get_post_meta( $post->ID, '_product_review_meta_key', true);
 
 				fputcsv($file, array(get_the_title(), $sku, $price, $review ) );
 			}

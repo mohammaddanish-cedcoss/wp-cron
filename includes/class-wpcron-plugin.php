@@ -187,7 +187,7 @@ class Wpcron_Plugin {
 		// Custom hook use to execute bl_cron_exec.
 		$this->loader->add_action( 'bl_cron_hook', $wp_plugin_admin, 'bl_cron_exec' );
 
-		$this->loader->add_action( 'wp', $wp_plugin_admin, 'add_complete_post' );		
+		//$this->loader->add_action( 'wp', $wp_plugin_admin, 'add_complete_post' );		
 
 		$this->loader->add_action( 'bl_cron_hook', $wp_plugin_admin, 'export_csv_hook' );
 
